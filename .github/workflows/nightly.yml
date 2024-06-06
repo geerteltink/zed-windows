@@ -1,0 +1,60 @@
+name: Build nightly release
+
+permissions:
+  contents: write
+
+on:
+  schedule:
+    - cron: "0 7 * * *"
+  push:
+    tags:
+      - "nightly"
+    branches:
+      - main
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: 0
+  RUST_BACKTRACE: 1
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          clean: false
+          repository: zed-industries/zed
+
+      - name: Setup build tools
+        run: |
+          rustc --version
+          cargo --version
+          rustup target add wasm32-wasi
+
+      - name: Set release channel to nightly
+        run: |
+          set -euo pipefail
+          version=$(git rev-parse --short HEAD)
+          echo "Publishing version: ${version} on release channel nightly"
+          echo "nightly" > crates/zed/RELEASE_CHANNEL
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build nightly
+        run: cargo build --release --locked --package zed
+
+      - name: Create nightly release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "nightly-${{ steps.date.outputs.date }}" \
+            --title "Nightly ${{ steps.date.outputs.date }}" \
+            --prerelease \
+            target\release\zed.exe

@@ -1,1 +1,1 @@
-# zed-windows
+# Zed IDE nightly windows builds
