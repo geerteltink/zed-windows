@@ -49,8 +49,8 @@ jobs:
       - name: Create nightly release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release create "nightly-${{ steps.date.outputs.now }}" \
-            --title "Nightly ${{ steps.date.outputs.now }}" \
-            --prerelease \
+        run: >
+          gh release create "nightly-${{ steps.date.outputs.now }}"
+            --title "Nightly ${{ steps.date.outputs.now }}"
+            --prerelease
             target\release\zed.exe
