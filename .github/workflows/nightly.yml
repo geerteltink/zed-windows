@@ -25,7 +25,8 @@ jobs:
         id: date
         run: |
           $NOW=& Get-Date -format yyyy-MM-dd
-          echo "NOW=$NOW" >> $env:GITHUB_ENV
+          echo "NOW: ${NOW}"
+          echo "::set-output name=now::${NOW}"
 
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -49,7 +50,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "nightly-${{ $env:NOW }}" \
-            --title "Nightly ${{ $env:NOW }}" \
+          gh release create "nightly-${{ steps.date.outputs.now }}" \
+            --title "Nightly ${{ steps.date.outputs.now }}" \
             --prerelease \
             target\release\zed.exe
