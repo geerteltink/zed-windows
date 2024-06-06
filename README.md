@@ -1,5 +1,6 @@
 # Zed IDE nightly windows builds
 
-IDE issues please report here: https://github.com/zed-industries/zed/issues
+Builds are attached to the action that runs daily.
 
-Build issues report here: https://github.com/geerteltink/zed-windows/pulls
+- IDE issues please report here: https://github.com/zed-industries/zed/issues
+- Build issues report here: https://github.com/geerteltink/zed-windows/pulls
