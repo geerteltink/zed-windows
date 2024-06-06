@@ -25,8 +25,7 @@ jobs:
         id: date
         run: |
           $NOW=& Get-Date -format yyyy-MM-dd
-          echo "NOW: ${NOW}"
-          echo "::set-output name=now::${NOW}"
+          echo "now=${NOW}" >> $GITHUB_OUTPUT
 
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -46,8 +45,7 @@ jobs:
       - name: Build nightly
         run: cargo build --release --locked --package zed
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: zed
-          path: target\release\zed.exe
+      - name: Create nightly release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create "${{ steps.date.outputs.now }}-nightly" --title "Nightly ${{ steps.date.outputs.now }}" --prerelease target\release\zed.exe
