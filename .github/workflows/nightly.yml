@@ -29,7 +29,7 @@ jobs:
       - name: Get current date
         id: vars
         run: |
-          $NOW = (Get-Date -format yyyy-MM-dd)
+          $NOW = (Get-Date -format yyyy.MM.dd)
           echo "NOW: ${NOW}"
           Write-Output "now=${NOW}" >> $Env:GITHUB_OUTPUT
           $HASH = (git rev-parse HEAD).Substring(0,9)
@@ -58,4 +58,4 @@ jobs:
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release create "${{ steps.vars.outputs.now }}-${{ steps.vars.outputs.hash }}" --title "Nightly ${{ steps.vars.outputs.now }}-${{ steps.vars.outputs.hash }}" --repo geerteltink/zed-windows --prerelease target\release\zed.exe
+        run: gh release create "${{ steps.vars.outputs.now }}-${{ steps.vars.outputs.hash }}" --title "Nightly ${{ steps.vars.outputs.now }} ${{ steps.vars.outputs.hash }}" --repo geerteltink/zed-windows --prerelease target\release\zed.exe
