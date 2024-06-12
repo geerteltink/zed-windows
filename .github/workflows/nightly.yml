@@ -24,6 +24,8 @@ jobs:
         run: |
           $NOW=& Get-Date -format yyyy-MM-dd
           echo "now=${NOW}" >> $GITHUB_OUTPUT
+          echo "GITHUB_SHA = ${GITHUB_SHA}"
+          echo "NOW = ${NOW}"
 
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -48,3 +50,8 @@ jobs:
         with:
           name: zed-editor
           path: target\release\zed.exe
+
+      - name: Create nightly release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create "${GITHUB_SHA}-nightly" --title "Nightly ${GITHUB_SHA}" --repo geerteltink/zed-windows --prerelease target\release\zed.exe
