@@ -26,16 +26,6 @@ jobs:
           clean: false
           repository: zed-industries/zed
 
-      - name: Get current date
-        id: vars
-        run: |
-          $NOW = (Get-Date -format yyyy.MM.dd)
-          echo "NOW: ${NOW}"
-          Write-Output "now=${NOW}" >> $Env:GITHUB_OUTPUT
-          $HASH = (git rev-parse HEAD).Substring(0,9)
-          echo "HASH: ${HASH}"
-          Write-Output "hash=${HASH}" >> $Env:GITHUB_OUTPUT
-
       - name: Setup build tools
         run: |
           rustc --version
@@ -48,8 +38,24 @@ jobs:
       - name: Build nightly
         run: cargo build --release --locked --package zed
 
+      - name: Install cargo get package
+        run: cargo install cargo-get
+
+      - name: Get vars
+        id: vars
+        run: |
+          $NOW = (Get-Date -format yyyyMMdd)
+          echo "NOW: ${NOW}"
+          Write-Output "now=${NOW}" >> $Env:GITHUB_OUTPUT
+          $HASH = (git rev-parse HEAD).Substring(0,9)
+          echo "HASH: ${HASH}"
+          Write-Output "hash=${HASH}" >> $Env:GITHUB_OUTPUT
+          $VERSION = (cargo get package.version --entry="./crates/zed")
+          echo "VERSION: ${VERSION}"
+          Write-Output "version=${VERSION}" >> $Env:GITHUB_OUTPUT
+
       - name: Create nightly release
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release create "${{ steps.vars.outputs.now }}-${{ steps.vars.outputs.hash }}" --title "${{ steps.vars.outputs.now }}-${{ steps.vars.outputs.hash }}" --notes "Nightly build" --repo geerteltink/zed-windows --latest target\release\zed.exe
+        run: gh release create "${{ steps.vars.outputs.version }}-dev.${{ steps.vars.outputs.now }}" --title "${{ steps.vars.outputs.version }}-dev.${{ steps.vars.outputs.now }}" --notes "Nightly v${{ steps.vars.outputs.version }}-dev.${{ steps.vars.outputs.now }} / ${{ steps.vars.outputs.hash }}" --repo geerteltink/zed-windows --latest target\release\zed.exe
