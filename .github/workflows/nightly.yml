@@ -58,4 +58,4 @@ jobs:
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release create "${{ steps.vars.outputs.now }}-${{ steps.vars.outputs.hash }}" --title "Nightly ${{ steps.vars.outputs.now }} ${{ steps.vars.outputs.hash }}" --repo geerteltink/zed-windows --prerelease target\release\zed.exe
+        run: gh release create "${{ steps.vars.outputs.now }}-${{ steps.vars.outputs.hash }}" --title "Nightly ${{ steps.vars.outputs.now }} ${{ steps.vars.outputs.hash }}" --repo geerteltink/zed-windows --latest target\release\zed.exe
