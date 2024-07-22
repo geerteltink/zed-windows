@@ -18,7 +18,7 @@ if ($releaseData.StatusCode -eq 200) {
   $version = $release.tag_name
 
   # Define the download path and filename (modify as needed)
-  $downloadPath = "."
+  $downloadPath = "$PSScriptRoot"
   $fileName = $release.assets[0].name
   $destination = "$downloadPath\$fileName"
 
