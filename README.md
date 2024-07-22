@@ -20,6 +20,11 @@ with winget:
 winget install Microsoft.VCRedist+.x64
 ```
 
+## Keeping up with the latest release
+
+I have added a [zed-update.ps1](.\zed-update.ps1) script to download the latest version. Zed IDE
+will be downloaded to the same location as the script.
+
 ## Reporting issues
 
 - Build issues can be reported here: https://github.com/geerteltink/zed-windows/pulls
