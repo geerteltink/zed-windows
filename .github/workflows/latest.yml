@@ -52,5 +52,39 @@ jobs:
     needs: prepare
 
     steps:
-      - run: echo "Proceeding with the build as the tag does not exist."
-      - run: echo ${{needs.prepare.outputs.tag}}
+      - run: echo "Building ${{needs.prepare.outputs.tag}}"
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          clean: false
+          repository: zed-industries/zed
+          ref: ${{needs.prepare.outputs.tag}}
+
+      - name: Setup build tools
+        run: |
+          rustc --version
+          cargo --version
+          rustup target add wasm32-wasi
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build latest
+        run: cargo build --release --locked --package zed
+
+      - name: Install cargo get package
+        run: cargo install cargo-get
+
+      - name: Get vars
+        id: vars
+        run: |
+          $HASH = (git rev-parse HEAD).Substring(0,9)
+          echo "HASH: ${HASH}"
+          Write-Output "hash=${HASH}" >> $Env:GITHUB_OUTPUT
+
+      - name: Create latest release
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create "${{needs.prepare.outputs.tag}}" --title "${{needs.prepare.outputs.tag}}.${{ steps.vars.outputs.hash }}" --notes "Latest ${{needs.prepare.outputs.tag}}.${{ steps.vars.outputs.hash }}" --repo geerteltink/zed-windows --latest target\release\zed.exe
