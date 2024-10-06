@@ -13,21 +13,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Check if tag exists
+      - name: Get latest tag
         id: check_tag
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          LATEST_TAG=$(gh release list --limit 1 --exclude-drafts --exclude-pre-releases --json tagName --jq '.[0].tagName')
+          LATEST_TAG=$(gh release list --limit 1 --repo zed-industries/zed --exclude-drafts --exclude-pre-releases --json tagName --jq '.[0].tagName')
           echo "Latest tag: $LATEST_TAG"
           TAG_EXISTS=$(git tag -l "$LATEST_TAG")
           if [ -z "$TAG_EXISTS" ]; then
             echo "Tag does not exist."
-            exit 1
           else
             echo "Tag exists."
+            exit 1
           fi
 
       - name: Proceed if tag exists
-        if: failure()
+        if: success()
         run: echo "Proceeding with the workflow as the tag does not exist."
