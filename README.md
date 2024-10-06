@@ -1,9 +1,10 @@
-# Zed IDE nightly windows builds
+# Zed IDE preview windows builds
 
-Here you can find the latest nightly Zed IDE builds for windows. The binary is compiled directly
+Here you can find the latest Zed IDE builds for windows. The binary is compiled directly
 from the original source code at https://github.com/zed-industries/zed/. None of the original
 code is modified. The build script is publically available
 [in this repo](https://github.com/geerteltink/zed-windows/blob/main/.github/workflows/nightly.yml).
+Everytime a new non-preview tag is pushed to the original repository, a new release is created.
 
 If you are having any issues with the editor or find any bugs, please report them
 [here](https://github.com/zed-industries/zed/issues).
