@@ -1,4 +1,4 @@
-name: Check if tag exists
+name: Sync latest tag
 
 on:
   workflow_dispatch:
@@ -15,6 +15,8 @@ jobs:
 
       - name: Check if tag exists
         id: check_tag
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           LATEST_TAG=$(gh release list --limit 1 --exclude-drafts --exclude-pre-releases --json tagName --jq '.[0].tagName')
           echo "Latest tag: $LATEST_TAG"
