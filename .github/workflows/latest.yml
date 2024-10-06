@@ -1,4 +1,4 @@
-name: Build nightly release
+name: Build latet release
 
 permissions:
   contents: write
