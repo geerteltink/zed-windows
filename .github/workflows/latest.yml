@@ -40,10 +40,10 @@ jobs:
         run: |
           TAG_EXISTS=$(git tag -l "${{ steps.vars.outputs.tag }}")
           if [ -z "$TAG_EXISTS" ]; then
-            echo "Tag does not exist."
-          else
             echo "Tag exists."
             exit 1
+          else
+            echo "Tag does not exist."
           fi
 
       - name: Cancel workflow if tag exists
