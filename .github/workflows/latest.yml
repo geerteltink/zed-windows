@@ -46,6 +46,18 @@ jobs:
             exit 1
           fi
 
+      - name: Cancel workflow if tag exists
+        if: steps.check_tag.conclusion == 'failure'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { GITHUB_RUN_ID } = process.env;
+            await github.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: GITHUB_RUN_ID
+            });
+
   build:
     runs-on: windows-latest
 
