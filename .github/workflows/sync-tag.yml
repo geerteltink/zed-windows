@@ -1,0 +1,31 @@
+name: Check if tag exists
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 5 * * *"
+
+jobs:
+  check-tag:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check if tag exists
+        id: check_tag
+        run: |
+          LATEST_TAG=$(gh release list --limit 1 --exclude-drafts --exclude-pre-releases --json tagName --jq '.[0].tagName')
+          echo "Latest tag: $LATEST_TAG"
+          TAG_EXISTS=$(git tag -l "$LATEST_TAG")
+          if [ -z "$TAG_EXISTS" ]; then
+            echo "Tag does not exist."
+            exit 1
+          else
+            echo "Tag exists."
+          fi
+
+      - name: Proceed if tag exists
+        if: failure()
+        run: echo "Proceeding with the workflow as the tag does not exist."

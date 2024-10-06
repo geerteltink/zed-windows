@@ -4,12 +4,9 @@ permissions:
   contents: write
 
 on:
-  workflow_dispatch:
-  schedule:
-    - cron: "0 5 * * *"
   push:
     tags:
-      - "nightly"
+      - "v*"
 
 env:
   CARGO_TERM_COLOR: always
@@ -25,6 +22,7 @@ jobs:
         with:
           clean: false
           repository: zed-industries/zed
+          ref: ${{ github.ref }}
 
       - name: Setup build tools
         run: |
@@ -35,7 +33,7 @@ jobs:
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
 
-      - name: Build nightly
+      - name: Build latest
         run: cargo build --release --locked --package zed
 
       - name: Install cargo get package
@@ -58,4 +56,4 @@ jobs:
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release create "${{ steps.vars.outputs.version }}-dev.${{ steps.vars.outputs.now }}" --title "${{ steps.vars.outputs.version }}-dev.${{ steps.vars.outputs.now }}" --notes "Nightly v${{ steps.vars.outputs.version }}-dev.${{ steps.vars.outputs.now }} / ${{ steps.vars.outputs.hash }}" --repo geerteltink/zed-windows --prerelease target\release\zed.exe
+        run: gh release create "${{ github.ref }}.${{ steps.vars.outputs.now }}" --title "${{ github.ref }}.${{ steps.vars.outputs.now }}" --notes "Latest ${{ github.ref }}.${{ steps.vars.outputs.now }} / ${{ steps.vars.outputs.hash }}" --repo geerteltink/zed-windows --latest target\release\zed.exe
