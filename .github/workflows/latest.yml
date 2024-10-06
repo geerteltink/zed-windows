@@ -1,4 +1,4 @@
-name: Build latet release
+name: Build latest release
 
 permissions:
   contents: write
