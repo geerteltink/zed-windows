@@ -2,6 +2,7 @@ name: Build latest release
 
 permissions:
   contents: write
+  actions: write
 
 on:
   workflow_dispatch:
@@ -24,7 +25,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Get latest tag
+      - name: Get latest tag from remote
         id: vars
         env:
           GH_TOKEN: ${{ github.token }}
@@ -33,7 +34,7 @@ jobs:
           echo "Latest tag: $LATEST_TAG"
           echo "tag=${LATEST_TAG}" >> "$GITHUB_OUTPUT"
 
-      - name: Check latest tag
+      - name: Check if latest tag exists
         id: check_tag
         env:
           GH_TOKEN: ${{ github.token }}
@@ -41,9 +42,8 @@ jobs:
           TAG_EXISTS=$(git tag -l "${{ steps.vars.outputs.tag }}")
           if [ -z "$TAG_EXISTS" ]; then
             echo "Tag exists."
-            exit 1
-          else
-            echo "Tag does not exist."
+            gh run cancel ${{ github.run_id }}
+            gh run watch ${{ github.run_id }}
           fi
 
   build:
@@ -54,7 +54,7 @@ jobs:
     steps:
       - run: echo "Building ${{needs.prepare.outputs.tag}}"
 
-      - name: Checkout repo
+      - name: Checkout remote repo
         uses: actions/checkout@v4
         with:
           clean: false
@@ -67,14 +67,11 @@ jobs:
           cargo --version
           rustup target add wasm32-wasi
 
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
+      - name: Setup cache
+        uses: swatinem/rust-cache@v2
 
       - name: Build latest
-        run: cargo build --release --locked --package zed
-
-      - name: Install cargo get package
-        run: cargo install cargo-get
+        run: cargo build -p zed
 
       - name: Get vars
         id: vars
