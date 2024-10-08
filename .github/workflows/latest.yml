@@ -39,7 +39,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           TAG_EXISTS=$(git tag -l "${{ steps.vars.outputs.tag }}")
-          if [ -z "$TAG_EXISTS" ]; then
+          if [ -n "$TAG_EXISTS" ]; then
             echo "Tag exists."
             echo "tag_exists='true'" >> "$GITHUB_OUTPUT"
           else
