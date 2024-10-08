@@ -71,7 +71,11 @@ jobs:
         uses: swatinem/rust-cache@v2
 
       - name: Build latest
-        run: cargo build -p zed
+        run: |
+          $Env:ZED_BUNDLE = "true"
+          $Env:RELEASE_VERSION = "${{needs.prepare.outputs.tag}}"
+          $Env:RUSTFLAGS = "${Env:RUSTFLAGS} -C link-args=-Wl,--disable-new-dtags,-rpath,\$ORIGIN/../lib"
+          cargo build --release --package zed --package cli
 
       - name: Get vars
         id: vars
