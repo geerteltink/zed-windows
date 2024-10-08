@@ -41,10 +41,10 @@ jobs:
           TAG_EXISTS=$(git tag -l "${{ steps.vars.outputs.tag }}")
           if [ -n "$TAG_EXISTS" ]; then
             echo "Tag exists."
-            echo "tag_exists='true'" >> "$GITHUB_OUTPUT"
+            echo "tag_exists=true" >> "$GITHUB_OUTPUT"
           else
             echo "Tag does not exist."
-            echo "tag_exists='false'" >> "$GITHUB_OUTPUT"
+            echo "tag_exists=false" >> "$GITHUB_OUTPUT"
           fi
 
   build:
