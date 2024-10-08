@@ -17,10 +17,9 @@ env:
 jobs:
   prepare:
     runs-on: ubuntu-latest
-
     outputs:
       tag: ${{ steps.vars.outputs.tag }}
-
+      tag_exists: ${{ steps.tag_exists.outputs.tag_exists }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -35,22 +34,23 @@ jobs:
           echo "tag=${LATEST_TAG}" >> "$GITHUB_OUTPUT"
 
       - name: Check if latest tag exists
-        id: check_tag
+        id: tag_exists
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           TAG_EXISTS=$(git tag -l "${{ steps.vars.outputs.tag }}")
           if [ -z "$TAG_EXISTS" ]; then
             echo "Tag exists."
-            gh run cancel ${{ github.run_id }}
-            gh run watch ${{ github.run_id }}
+            echo "tag_exists='true'" >> "$GITHUB_OUTPUT"
+          else
+            echo "Tag does not exist."
+            echo "tag_exists='false'" >> "$GITHUB_OUTPUT"
           fi
 
   build:
     runs-on: windows-latest
-
     needs: prepare
-
+    if: needs.prepare.outputs.tag_exists == 'false'
     steps:
       - run: echo "Building ${{needs.prepare.outputs.tag}}"
 
