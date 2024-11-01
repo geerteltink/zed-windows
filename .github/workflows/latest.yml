@@ -63,6 +63,7 @@ jobs:
 
       - name: Setup build tools
         run: |
+          git config --system core.longpaths true
           rustc --version
           cargo --version
           rustup target add wasm32-wasi
