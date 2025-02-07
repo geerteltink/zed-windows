@@ -66,7 +66,8 @@ jobs:
           git config --system core.longpaths true
           rustc --version
           cargo --version
-          rustup target add wasm32-wasi
+          # rustup target add wasm32-wasi
+          rustup target install aarch64-pc-windows-msvc
 
       - name: Setup cache
         uses: swatinem/rust-cache@v2
@@ -76,7 +77,8 @@ jobs:
           $Env:ZED_BUNDLE = "true"
           $Env:RELEASE_VERSION = "${{needs.prepare.outputs.tag}}"
           $Env:RUSTFLAGS = "${Env:RUSTFLAGS} -C link-args=-Wl,--disable-new-dtags,-rpath,\$ORIGIN/../lib"
-          cargo build --release --package zed --package cli
+          # cargo build --release --package zed --package cli
+          cargo build --target=aarch64-pc-windows-msvc --release --package zed --package cli
 
       - name: Get vars
         id: vars
