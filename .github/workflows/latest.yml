@@ -75,7 +75,7 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Add WASM target
+      - name: Add target
         run: |
           rustc --version
           cargo --version
@@ -91,13 +91,12 @@ jobs:
       - name: Build project
         working-directory: zed
         shell: pwsh
-        continue-on-error: true
         env:
           ZED_BUNDLE: "true"
           RELEASE_VERSION: ${{needs.prepare.outputs.tag}}
           CARGO_PROFILE_RELEASE_DEBUG: "false"
           RUSTFLAGS: "-C symbol-mangling-version=v0 --cfg tokio_unstable --cfg windows_slim_errors -C target-feature=+crt-static"
-        run: cargo build --release --verbose
+        run: cargo build --release --target aarch64-pc-windows-msvc
 
       - name: Get vars
         id: vars
