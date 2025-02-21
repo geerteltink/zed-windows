@@ -81,7 +81,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: nightly
-          target: aarch64-pc-windows-msvc
+          targets: aarch64-pc-windows-msvc
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
