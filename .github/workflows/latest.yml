@@ -72,15 +72,16 @@ jobs:
           ref: ${{needs.prepare.outputs.tag}}
           path: zed
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+      - name: Configure build for ARM64
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: amd64_arm64
 
-      - name: Add target
-        run: |
-          rustc --version
-          cargo --version
-          # rustup target add wasm32-wasi
-          rustup target add aarch64-pc-windows-msvc
+      - name: Install rust nightly
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: nightly
+          target: aarch64-pc-windows-msvc
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -95,7 +96,7 @@ jobs:
           ZED_BUNDLE: "true"
           RELEASE_VERSION: ${{needs.prepare.outputs.tag}}
           CARGO_PROFILE_RELEASE_DEBUG: "false"
-          RUSTFLAGS: "-C symbol-mangling-version=v0 --cfg tokio_unstable --cfg windows_slim_errors -C target-feature=+crt-static"
+          RUSTFLAGS: "-C symbol-mangling-version=v0 --cfg tokio_unstable --cfg windows_slim_errors -C target-feature=+crt-static --cfg gles"
         run: cargo build --release --target aarch64-pc-windows-msvc
 
       - name: Get vars
