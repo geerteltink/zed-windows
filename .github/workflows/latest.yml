@@ -54,31 +54,50 @@ jobs:
     steps:
       - run: echo "Building ${{needs.prepare.outputs.tag}}"
 
-      - name: Checkout remote repo
+      - name: Enable long paths in Git
+        run: git config --system core.longpaths true
+
+      - name: Enable long paths in Windows
+        shell: pwsh
+        run: |
+          New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
+
+      - name: Switch to branch
+        uses: actions/checkout@v4
+
+      - name: Checkout Zed
         uses: actions/checkout@v4
         with:
-          clean: false
           repository: zed-industries/zed
           ref: ${{needs.prepare.outputs.tag}}
+          path: zed
 
-      - name: Setup build tools
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Add WASM target
         run: |
-          git config --system core.longpaths true
           rustc --version
           cargo --version
           # rustup target add wasm32-wasi
           rustup target install aarch64-pc-windows-msvc
 
-      - name: Setup cache
-        uses: swatinem/rust-cache@v2
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.backend }}
+          workspaces: "zed -> target"
 
-      - name: Build latest
-        run: |
-          $Env:ZED_BUNDLE = "true"
-          $Env:RELEASE_VERSION = "${{needs.prepare.outputs.tag}}"
-          $Env:RUSTFLAGS = "${Env:RUSTFLAGS} -C link-args=-Wl,--disable-new-dtags,-rpath,\$ORIGIN/../lib"
-          # cargo build --release --package zed --package cli
-          cargo build --target=aarch64-pc-windows-msvc --release --package zed --package cli
+      - name: Build project
+        working-directory: zed
+        shell: pwsh
+        continue-on-error: true
+        env:
+          ZED_BUNDLE: "true"
+          RELEASE_VERSION: ${{needs.prepare.outputs.tag}}
+          CARGO_PROFILE_RELEASE_DEBUG: "false"
+          RUSTFLAGS: "-C symbol-mangling-version=v0 --cfg tokio_unstable --cfg windows_slim_errors -C target-feature=+crt-static"
+        run: cargo build --release --verbose --jobs $env:CPU_CORES
 
       - name: Get vars
         id: vars
@@ -91,4 +110,4 @@ jobs:
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release create "${{needs.prepare.outputs.tag}}" --title "${{needs.prepare.outputs.tag}}.${{ steps.vars.outputs.hash }}" --notes "Latest ${{needs.prepare.outputs.tag}}.${{ steps.vars.outputs.hash }}" --repo geerteltink/zed-windows --latest target\release\zed.exe
+        run: gh release create "${{needs.prepare.outputs.tag}}" --title "${{needs.prepare.outputs.tag}}.${{ steps.vars.outputs.hash }}" --notes "Latest ${{needs.prepare.outputs.tag}}.${{ steps.vars.outputs.hash }}" --repo geerteltink/zed-windows --latest zed\target\release\zed.exe
