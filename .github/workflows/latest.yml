@@ -97,7 +97,7 @@ jobs:
           RELEASE_VERSION: ${{needs.prepare.outputs.tag}}
           CARGO_PROFILE_RELEASE_DEBUG: "false"
           RUSTFLAGS: "-C symbol-mangling-version=v0 --cfg tokio_unstable --cfg windows_slim_errors -C target-feature=+crt-static"
-        run: cargo build --release --verbose --jobs $env:CPU_CORES
+        run: cargo build --release --verbose
 
       - name: Get vars
         id: vars
