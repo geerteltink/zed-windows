@@ -80,7 +80,7 @@ jobs:
           rustc --version
           cargo --version
           # rustup target add wasm32-wasi
-          rustup target install aarch64-pc-windows-msvc
+          rustup target add aarch64-pc-windows-msvc
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
