@@ -72,12 +72,12 @@ jobs:
           ref: ${{needs.prepare.outputs.tag}}
           path: zed
 
-      - name: Install rust nightly
+      - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: nightly
-          override: true
-          target: wasm32-wasip1
+          components: rustfmt, clippy
+          # toolchain: nightly
+          # target: wasm32-wasip1
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -93,7 +93,7 @@ jobs:
           RUSTFLAGS: "-C symbol-mangling-version=v0 --cfg tokio_unstable --cfg windows_slim_errors -C target-feature=+crt-static"
           RELEASE_VERSION: ${{needs.prepare.outputs.tag}}
           ZED_UPDATE_EXPLANATION: "Auto-updater disabled (vhanla/zed-windows)"
-        run: cargo build --release --verbose
+        run: cargo build --release
 
       - name: Get vars
         id: vars
