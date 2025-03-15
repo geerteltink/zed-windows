@@ -72,16 +72,12 @@ jobs:
           ref: ${{needs.prepare.outputs.tag}}
           path: zed
 
-      - name: Configure build for ARM64
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: amd64_arm64
-
       - name: Install rust nightly
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: nightly
-          targets: aarch64-pc-windows-msvc
+          override: true
+          target: wasm32-wasip1
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -93,11 +89,11 @@ jobs:
         working-directory: zed
         shell: pwsh
         env:
-          ZED_BUNDLE: "true"
-          RELEASE_VERSION: ${{needs.prepare.outputs.tag}}
           CARGO_PROFILE_RELEASE_DEBUG: "false"
-          RUSTFLAGS: "-C symbol-mangling-version=v0 --cfg tokio_unstable --cfg windows_slim_errors -C target-feature=+crt-static --cfg gles"
-        run: cargo build --release --target aarch64-pc-windows-msvc
+          RUSTFLAGS: "-C symbol-mangling-version=v0 --cfg tokio_unstable --cfg windows_slim_errors -C target-feature=+crt-static"
+          RELEASE_VERSION: ${{needs.prepare.outputs.tag}}
+          ZED_UPDATE_EXPLANATION: "Auto-updater disabled (vhanla/zed-windows)"
+        run: cargo build --release --verbose
 
       - name: Get vars
         id: vars
