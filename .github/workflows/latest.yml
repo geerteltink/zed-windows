@@ -35,9 +35,14 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          LATEST_TAG=$(gh release list --limit 1 --repo zed-industries/zed --exclude-drafts --exclude-pre-releases --json tagName --jq '.[0].tagName')
-          echo "Latest tag: $LATEST_TAG"
-          echo "tag=${LATEST_TAG}" >> "$GITHUB_OUTPUT"
+          UPSTREAM_RELEASE=$(gh api repos/zed-industries/zed/releases/latest --jq '{tag_name, body}')
+          UPSTREAM_TAG=$(echo "$UPSTREAM_RELEASE" | jq -r '.tag_name')
+          echo "Upstream tag: $UPSTREAM_TAG"
+          echo "tag=${UPSTREAM_TAG}" >> "$GITHUB_OUTPUT"
+          UPSTREAM_NOTES=$(echo "$UPSTREAM_RELEASE" | jq -r '.body')
+          echo "notes<<EOF" >> $GITHUB_OUTPUT
+          echo "$UPSTREAM_NOTES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Check if latest tag exists
         id: tag_exists
@@ -88,7 +93,6 @@ jobs:
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
         with:
-          key: ${{ matrix.backend }}
           workspaces: "zed -> target"
 
       - name: Build project
@@ -112,4 +116,4 @@ jobs:
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release create "${{needs.prepare.outputs.tag}}" --title "${{needs.prepare.outputs.tag}}.${{ steps.vars.outputs.hash }}" --notes "Latest ${{needs.prepare.outputs.tag}}.${{ steps.vars.outputs.hash }}" --repo geerteltink/zed-windows --latest zed\target\release\zed.exe
+        run: gh release create "${{needs.prepare.outputs.tag}}" --title "${{needs.prepare.outputs.tag}}.${{ steps.vars.outputs.hash }}" --notes "Latest ${{needs.prepare.outputs.tag}}.${{ steps.vars.outputs.hash }}\n\n${{ steps.vars.outputs.notes }}" --repo geerteltink/zed-windows --latest zed\target\release\zed.exe
