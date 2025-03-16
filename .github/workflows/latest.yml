@@ -19,6 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.vars.outputs.tag }}
+      notes: ${{ steps.vars.outputs.notes }}
       tag_exists: ${{ steps.tag_exists.outputs.tag_exists }}
     steps:
       - name: Checkout repository
