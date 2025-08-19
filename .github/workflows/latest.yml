@@ -23,7 +23,7 @@ jobs:
       tag_exists: ${{ steps.tag_exists.outputs.tag_exists }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Fetch tags
         run: |
@@ -74,10 +74,10 @@ jobs:
           New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
 
       - name: Switch to branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Checkout Zed
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: zed-industries/zed
           ref: ${{needs.prepare.outputs.tag}}
