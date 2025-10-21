@@ -1,5 +1,9 @@
 # Zed IDE preview windows builds
 
+> [!WARNING]  
+> This project is archived now because Zed IDE builds for windows are now activated. You can
+> download original builds from https://github.com/zed-industries/zed/releases
+
 Here you can find the latest Zed IDE builds for windows. The binary is compiled directly
 from the original source code at https://github.com/zed-industries/zed/. None of the original
 code is modified. The build script is publically available
